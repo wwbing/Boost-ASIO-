@@ -1,0 +1,5 @@
+.vs/
+asio_tcp_server/
+x64/
+asio_tcp_server.v*
+asio_tcp_server.sln

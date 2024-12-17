@@ -12,4 +12,6 @@ const int MAX_LENGTH = 1024;
 int main()
 {
     cout << "Hello sync-server!\n";
+
+
 }

@@ -23,4 +23,11 @@ extern void client_connect();
 //连接到域名解析服务器进行域名解析
 extern void dns_connect();
 
-void 
+//客户端发送数据（ socket.write_some()、socket.send()、asio::write(socket,data) ）
+extern void client_write_some_or_send_or_write();
+
+//客户端接收数据（ socket.read_some()、socket.receive()、asio::read(socket,data) ）
+extern void client_read_some_or_receive_or_read();
+
+//asio的网络传输数据流
+extern void use_const_buffer();

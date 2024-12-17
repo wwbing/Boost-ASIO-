@@ -88,7 +88,6 @@ void bind() {
     boost::system::error_code ec;
     acceptor.bind(ep, ec);
 
-
 }
 
 
@@ -111,6 +110,8 @@ void accept_new_connection() {
     boost::asio::ip::tcp::socket c_socket(ioc);
     acceptor.accept(c_socket);
 
+    //随后使用c_socket通信
+
 }
 
 
@@ -129,6 +130,8 @@ void client_connect() {
 
     //连接
     socket.connect(ep);
+
+    //随后进行通信
 
 }
 
@@ -155,29 +158,39 @@ void dns_connect() {
 }
 
 
-int main()
-{
+void use_const_buffer() {
+    
+    /*
+        首先搞清楚基本存储结构：
+            传递的数据就是 一个地址数组 + N个数据数组，地址数组每个元素都挂着一个数据数组，存放的是改数据数组的首地址。
+            并且每个数据数组的第一个元素是数据的长度
+    */
+    
 
+    {   
+        //基本方法
+        std::string buf = "HELLO WORLD";                                //原始数据
+        boost::asio::const_buffer asio_buf(buf.c_str(), buf.length());  //构造数据数组
 
-    //服务端一口气做完linux下的：指定ip和端口、创建套接字、绑定
+        std::vector<boost::asio::const_buffer> buffer_sequence;         //将数据数组放到地址数组内
+        buffer_sequence.push_back(asio_buf);
+
+        //接下来可以将buffer_sequence发送到网络中
+    }
+
     {
-        using namespace boost::asio;
+        //另一种方法:一步到位
+        boost::asio::const_buffers_1 output_buf = boost::asio::buffer("HELLO WORLD");
 
-
-        /*
-            注意：ip::tcp::v4()是协议，
-            而本机的全部ipv4地址写法是：ip::address_v4::any();
-
-            endpoint有两个重载的构造函数
-                一个接收：     ip地址 + port端口
-                另一个接收：   protocol协议 + port端口(默认所有的本机地址)
-        */
-
-        io_context ioc;
-        ip::tcp::endpoint endpoint(ip::tcp::v4(), 3333);
-        ip::tcp::acceptor bind(ioc, endpoint);
+        //接下来可以将output_buf发送到网络中 
     }
 
 
+
+}
+
+
+int main()
+{
     return 0;
 }

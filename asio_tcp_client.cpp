@@ -49,13 +49,17 @@ int main()
 
         //读取服务器回复的数据
         char reply[MAX_LENGTH];
-        asio::mutable_buffers_1 reply_sequence = asio::buffer(reply, MAX_LENGTH);
+        asio::mutable_buffers_1 reply_sequence = asio::buffer(reply, strlen(request));
 
         size_t reply_length = asio::read(soc,reply_sequence);
 
         if (reply_length) {
             cout << "已接收" << reply_length << "字节的数据" << endl;
         }
+
+        std::cout << "服务器回传是: ";
+        std::cout.write(reply, reply_length);
+        std::cout << endl;
 
     }
     catch (system::system_error& e) {

@@ -16,9 +16,8 @@ typedef std::shared_ptr<asio::ip::tcp::socket> sock_ptr;
 set<std::shared_ptr<thread>> thread_set;
 
 
-
 //会话函数
-void session(sock_ptr sock) {
+void sync_session(sock_ptr sock) {
     try {
         while (1) {
             char data[MAX_LENGTH];
@@ -52,7 +51,7 @@ void session(sock_ptr sock) {
 }
 
 //连接函数
-void server(asio::io_context& ioc, unsigned short port) {
+void sync_server(asio::io_context& ioc, unsigned short port) {
     //创建acceptor 绑定本地需要监听的地址
     asio::ip::tcp::acceptor a(ioc, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
 
@@ -63,7 +62,7 @@ void server(asio::io_context& ioc, unsigned short port) {
         a.accept(*socket);
 
         //开一个线程和这个客户端通信
-        auto t = std::make_shared<std::thread>(session, socket);
+        auto t = std::make_shared<std::thread>(sync_session, socket);
 
         //引用计数加1，这样t不会马上回收
         thread_set.insert(t);
@@ -72,13 +71,14 @@ void server(asio::io_context& ioc, unsigned short port) {
 
 }
 
-int main()
-{
+//同步通信服务器端
+void sync_server_start() {
+
     cout << "Hello sync-server!\n";
 
     try {
         asio::io_context ioc;
-        server(ioc, 10086);
+        sync_server(ioc, 10086);
 
         for (auto& t : thread_set) {
             t->join();
@@ -88,6 +88,12 @@ int main()
     catch (std::exception& e) {
         cerr << "Exception in main: " << e.what() << endl;
     }
+}
+
+
+int main()
+{
+    sync_server_start();
 
     return 0;
 }

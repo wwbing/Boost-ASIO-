@@ -9,15 +9,15 @@ using namespace boost;
 
 const int MAX_LENGTH = 1024;
 
-int main()
-{
+//同步通信客户端
+void sync_client_start() {
     cout << "Hello sync-client!\n";
 
 
     try {
         //创建上下文服务
         asio::io_context ioc;
-        
+
         //端点地址
         asio::ip::tcp::endpoint ep(asio::ip::address::from_string("127.0.0.1"), 10086);
 
@@ -31,7 +31,7 @@ int main()
 
         if (host_err) {
             cout << "连接失败，错误码是： " << host_err.value() << "  错误信息是：" << host_err.message() << endl;
-            return 0;
+            return;
         }
         cout << "连接成功，输入信息发送给服务器" << endl;
 
@@ -39,7 +39,7 @@ int main()
         char request[MAX_LENGTH];
         cin.getline(request, MAX_LENGTH);
         asio::mutable_buffers_1 req_sequence = asio::buffer(request, strlen(request));
-      
+
         //发送
         size_t write_length = asio::write(soc, req_sequence);
 
@@ -51,7 +51,7 @@ int main()
         char reply[MAX_LENGTH];
         asio::mutable_buffers_1 reply_sequence = asio::buffer(reply, strlen(request));
 
-        size_t reply_length = asio::read(soc,reply_sequence);
+        size_t reply_length = asio::read(soc, reply_sequence);
 
         if (reply_length) {
             cout << "已接收" << reply_length << "字节的数据" << endl;
@@ -65,6 +65,12 @@ int main()
     catch (system::system_error& e) {
 
     }
+}
+
+
+int main()
+{
+    sync_client_start();
     
     return 0;
 }
